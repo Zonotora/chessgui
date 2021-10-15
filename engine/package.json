@@ -1,0 +1,22 @@
+{
+  "name": "engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "engine": "nodemon index.js",
+    "client": "npm start --prefix ../client",
+    "start": "concurrently \"npm run engine\" \"npm run client\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "concurrently": "^6.3.0",
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.13"
+  }
+}
