@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import Chessboard from "chessboardjsx";
-import * as ChessJS from "chess.js";
+import {
+  BsFillSkipEndFill,
+  BsFillSkipForwardFill,
+  BsFillSkipStartFill,
+  BsFillSkipBackwardFill,
+} from "react-icons/bs";
 
-const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess;
+import History from "./components/History";
+import Chess from "./chess";
 
 // pass in a FEN string to load a particular position
-const chess = new Chess(
-  "r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - c3 0 19"
-);
+
 const pgn = [
   '[Event "Casual Game"]',
   '[Site "Berlin GER"]',
@@ -29,7 +33,6 @@ const pgn = [
   "Rg8 19.Rad1 Qxf3 20.Rxe7+ Nxe7 21.Qxd7+ Kxd7 22.Bf5+ Ke8",
   "23.Bd7+ Kf8 24.Bxe7# 1-0",
 ];
-chess.load_pgn(pgn.join("\n"));
 
 const post = async (url = "", data = {}) => {
   const response = await fetch(url, {
@@ -49,20 +52,24 @@ const post = async (url = "", data = {}) => {
 };
 
 const App: React.FC = () => {
-  const [fen, setFen] = useState(
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-  );
+  const [chess, setChess] = useState(new Chess());
+  const [fen, setFen] = useState<string>(new Chess().fen());
 
   useEffect(() => {
-    const fen = chess.fen();
+    const fen = chess.now();
+    setFen(fen);
+  }, [chess]);
 
-    post("/api", {
-      fen,
-    }).then((response) => {
-      console.log(response);
-      setFen(fen);
-    });
-  }, []);
+  // useEffect(() => {
+  //   const fen = chess.fen();
+
+  //   post("/api", {
+  //     fen,
+  //   }).then((response) => {
+  //     console.log(response);
+  //     setFen(fen);
+  //   });
+  // }, [chess]);
 
   return (
     <div>
@@ -73,14 +80,67 @@ const App: React.FC = () => {
         </div>
 
         <div className="splitter"></div>
+
         <div className="panel">
-          <div className="moves"></div>
-          <div className="moves"></div>
-          <input
-            type="text"
-            name="name"
-            onChange={(e) => setFen(e.target.value)}
-          />
+          <div className="moves">
+            {/* <input type="text" /> */}
+            <div
+              className="submit"
+              onClick={() => {
+                setChess(new Chess("", pgn.join("\n")));
+              }}
+            >
+              load
+            </div>
+          </div>
+          <div className="moves">
+            <History
+              moves={chess.history()}
+              onClick={(move) => {
+                const fen = chess.moveTo(move);
+                setFen(fen);
+              }}
+            />
+          </div>
+
+          <div className="play-panel">
+            <div
+              className="first"
+              onClick={() => {
+                const fen = chess.first();
+                setFen(fen);
+              }}
+            >
+              <BsFillSkipBackwardFill size={40} />
+            </div>
+            <div
+              className="previous"
+              onClick={() => {
+                const fen = chess.previous();
+                setFen(fen);
+              }}
+            >
+              <BsFillSkipStartFill size={40} />
+            </div>
+            <div
+              className="next"
+              onClick={() => {
+                const fen = chess.next();
+                setFen(fen);
+              }}
+            >
+              <BsFillSkipEndFill size={40} />
+            </div>
+            <div
+              className="last"
+              onClick={() => {
+                const fen = chess.last();
+                setFen(fen);
+              }}
+            >
+              <BsFillSkipForwardFill size={40} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
