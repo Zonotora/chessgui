@@ -10,6 +10,8 @@ import {
 
 import History from "./components/History";
 import Chess from "./chess";
+import Chart from "./components/Chart";
+import { maxHeaderSize } from "http";
 
 // pass in a FEN string to load a particular position
 
@@ -73,17 +75,21 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <div className="chess">
-        <div className="evalbar"></div>
+      <div className="top"></div>
+      <div className="middle">
         <div className="board">
-          <Chessboard position={fen} />
+          <Chessboard
+            position={fen}
+            calcWidth={({ screenWidth, screenHeight }) =>
+              Math.max(Math.min(300, screenHeight * 0.7), screenHeight * 0.7)
+            }
+          />
         </div>
 
-        <div className="splitter"></div>
+        <div className="evalbar" />
 
         <div className="panel">
           <div className="moves">
-            {/* <input type="text" /> */}
             <div
               className="submit"
               onClick={() => {
@@ -142,6 +148,9 @@ const App: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="bottom">
+        <Chart x={[1, 2, 3]} y={[1, 2, 3]} />
       </div>
     </div>
   );

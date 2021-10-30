@@ -2,8 +2,23 @@ body {
   background-color: #202020;
 }
 
-.chess {
+:root {
+  --top-height: 25px;
+  --middle-height: calc(70vh);
+  --bottom-height: calc(30vh - 25px);
+}
+
+.top {
+  height: var(--top-height);
+}
+
+.middle {
+  height: var(--middle-height);
   display: flex;
+}
+
+.bottom {
+  height: var(--bottom-height);
 }
 
 .evalbar {
@@ -13,12 +28,7 @@ body {
 
 .board {
   width: calc(50% - 12px);
-}
-
-.splitter {
-  background-color: #101010;
-  cursor: crosshair;
-  width: 2px;
+  height: inherit;
 }
 
 .panel {
@@ -68,4 +78,9 @@ body {
   height: 20px;
   cursor: pointer;
   color: white;
+}
+
+.eval-chart {
+  width: 100%;
+  height: 100%;
 }
