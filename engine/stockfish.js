@@ -7,8 +7,8 @@ const parseInfo = (s) => {
       case "score":
         const score = {};
         if (info[i + 1] == "cp") score["cp"] = parseInt(info[i + 2]) / 100.0;
-        if (info[i + 3] == "mate") score["mate"] = info[i + 4];
-        i += 4;
+        else if (info[i + 1] == "mate") score["mate"] = info[i + 2];
+        i += 2;
         ret[v] = score;
         break;
       case "pv":
