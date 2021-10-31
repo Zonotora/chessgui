@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Chart, registerables } from "chart.js";
 
 const data = {
-  labels: ["1", "2", "3", "4", "5", "6"],
+  labels: [],
   datasets: [
     {
-      label: "test",
-      data: [12, -19, 3, 5, 2, 3],
+      label: "Evaluation",
+      data: [],
       fill: {
         target: "origin",
         above: "rgba(255, 255, 255, 0.5)", // Area will be red above the origin
@@ -29,22 +29,12 @@ const options = {
   },
 };
 
-const CustomChart = ({ x, y }) => {
-  const [ctx, setCtx] = useState();
+const EvalChart = ({ scores }) => {
   const [chart, setChart] = useState();
 
   useEffect(() => {
     Chart.register(...registerables);
-    setCtx(document.getElementById("eval-chart-canvas").getContext("2d"));
-  }, []);
-
-  useEffect(() => {
-    if (!ctx) return;
-
-    if (chart) {
-      chart.destroy();
-    }
-
+    const ctx = document.getElementById("eval-chart-canvas").getContext("2d");
     setChart(
       new Chart(ctx, {
         type: "line",
@@ -52,7 +42,14 @@ const CustomChart = ({ x, y }) => {
         options: options,
       })
     );
-  }, [x, y]);
+  }, []);
+
+  useEffect(() => {
+    if (!chart) return;
+    chart.data.datasets[0].data = scores;
+    chart.data.labels = scores.map((_, i) => i);
+    chart.update();
+  }, [scores, chart]);
 
   return (
     <div className="eval-chart">
@@ -61,4 +58,4 @@ const CustomChart = ({ x, y }) => {
   );
 };
 
-export default CustomChart;
+export default EvalChart;

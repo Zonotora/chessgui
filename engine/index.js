@@ -1,35 +1,50 @@
 const express = require("express");
-const { spawn } = require("child_process");
 const dotenv = require("dotenv");
+const { spawn } = require("child_process");
+const Stockfish = require("./stockfish");
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3001;
 
 const app = express();
-const engine = spawn(process.env.ENGINE);
-
 app.use(express.json());
-
-const sendUCI = (msg) => {
-  engine.stdin.write(`${msg}\n`);
-};
-
-engine.stdout.on("data", (chunk) => {
-  console.log(chunk.toString("ascii"));
-});
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
-app.post("/api", function (req, res) {
-  console.log(req.body);
-  // console.log(engine);
-  // sendUCI(`position fen ${req.body.fen}`);
-  sendUCI("eval");
+const engineProcess = spawn(process.env.ENGINE);
+const engine = new Stockfish();
 
-  // engine.send(`position fen ${req.body.fen}`);
+const sendUCI = (msg) => {
+  engineProcess.stdin.write(`${msg}\n`);
+};
 
-  res.json({ message: "stockfish" });
+engineProcess.stdout.on("data", (chunk) => {
+  const s = chunk.toString("ascii");
+  if (engine.parse(s)) {
+    const fen = engine.next();
+    console.log(fen);
+
+    sendUCI(`position fen ${fen}`);
+    sendUCI("go depth 15");
+  }
+});
+
+sendUCI("isready");
+sendUCI("setoption name threads value 4");
+
+app.post("/api/new", function (req, res) {
+  const fens = req.body.fens;
+  const fen = fens.shift();
+  engine.setFens(fens);
+  sendUCI(`position fen ${fen}`);
+  sendUCI("go depth 15");
+
+  res.json({ status: engine.status });
+});
+
+app.post("/api/status", function (req, res) {
+  res.json({ info: engine.info, status: engine.status });
 });

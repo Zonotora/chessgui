@@ -4,8 +4,8 @@ body {
 
 :root {
   --top-height: 25px;
-  --middle-height: calc(70vh);
-  --bottom-height: calc(30vh - 25px);
+  --middle-height: calc(65vh);
+  --bottom-height: calc(35vh - 25px);
 }
 
 .top {
@@ -19,6 +19,15 @@ body {
 
 .bottom {
   height: var(--bottom-height);
+}
+
+.header div {
+  height: inherit;
+  width: 50px;
+  border: 1px solid white;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
 }
 
 .evalbar {
@@ -52,15 +61,6 @@ body {
   border-radius: 5px;
   height: 30px;
   cursor: pointer;
-}
-
-.submit {
-  width: 50px;
-  height: 30px;
-  border: 1px solid white;
-  border-radius: 5px;
-  cursor: pointer;
-  color: white;
 }
 
 .moves input {

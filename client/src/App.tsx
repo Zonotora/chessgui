@@ -11,7 +11,7 @@ import {
 import History from "./components/History";
 import Chess from "./chess";
 import Chart from "./components/Chart";
-import { maxHeaderSize } from "http";
+import Header from "./components/Header";
 
 // pass in a FEN string to load a particular position
 
@@ -56,32 +56,56 @@ const post = async (url = "", data = {}) => {
 const App: React.FC = () => {
   const [chess, setChess] = useState(new Chess());
   const [fen, setFen] = useState<string>(new Chess().fen());
+  const [scores, setScores] = useState<number[]>([]);
 
   useEffect(() => {
     const fen = chess.now();
     setFen(fen);
+    const baseScores: number[] = [];
+    for (let i = 0; i < chess.fens.length; i++) {
+      baseScores.push(0);
+    }
+    setScores(baseScores);
+
+    post("/api/new", {
+      fens: chess.fens,
+    }).then((response) => {
+      console.log(response);
+    });
+
+    const interval = setInterval(() => {
+      post("/api/status", {
+        fens: chess.fens,
+      }).then((response) => {
+        const tScores = [...baseScores];
+        for (let i = 0; i < response.info.length; i++) {
+          tScores[i] = response.info[i].info.score.cp;
+        }
+        console.log(response);
+        setScores(tScores);
+        if (response.status) {
+          clearInterval(interval);
+        }
+      });
+    }, 3000);
+    return () => clearInterval(interval);
   }, [chess]);
-
-  // useEffect(() => {
-  //   const fen = chess.fen();
-
-  //   post("/api", {
-  //     fen,
-  //   }).then((response) => {
-  //     console.log(response);
-  //     setFen(fen);
-  //   });
-  // }, [chess]);
 
   return (
     <div>
-      <div className="top"></div>
+      <div className="top">
+        <Header
+          loadPGN={() => {
+            setChess(new Chess("", pgn.join("\n")));
+          }}
+        />
+      </div>
       <div className="middle">
         <div className="board">
           <Chessboard
             position={fen}
             calcWidth={({ screenWidth, screenHeight }) =>
-              Math.max(Math.min(300, screenHeight * 0.7), screenHeight * 0.7)
+              Math.max(Math.min(300, screenHeight * 0.7), screenHeight * 0.65)
             }
           />
         </div>
@@ -89,16 +113,6 @@ const App: React.FC = () => {
         <div className="evalbar" />
 
         <div className="panel">
-          <div className="moves">
-            <div
-              className="submit"
-              onClick={() => {
-                setChess(new Chess("", pgn.join("\n")));
-              }}
-            >
-              load
-            </div>
-          </div>
           <div className="moves">
             <History
               moves={chess.history()}
@@ -150,7 +164,7 @@ const App: React.FC = () => {
         </div>
       </div>
       <div className="bottom">
-        <Chart x={[1, 2, 3]} y={[1, 2, 3]} />
+        <Chart scores={scores} />
       </div>
     </div>
   );
