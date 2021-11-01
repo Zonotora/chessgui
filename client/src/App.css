@@ -35,8 +35,16 @@ body {
 }
 
 .evalbar {
-  width: 10px;
-  background-color: green;
+  width: 18px;
+  display: flex;
+  flex-direction: column;
+  font-size: 7pt;
+  text-align: center;
+  margin-right: 5px;
+}
+
+.evalbar div {
+  transition: height 0.75s ease-in-out;
 }
 
 .board {

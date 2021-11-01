@@ -12,6 +12,7 @@ import History from "./components/History";
 import Chess from "./chess";
 import Chart from "./components/Chart";
 import Header from "./components/Header";
+import Evalbar from "./components/Evalbar";
 import data from "./data.json";
 import data2 from "./data2.json";
 
@@ -196,7 +197,7 @@ const App: React.FC = () => {
           />
         </div>
 
-        <div className="evalbar" />
+        <Evalbar evaluation={scores.length > 0 ? scores[move] : 0.0} />
 
         <div className="panel">
           <div className="moves">
