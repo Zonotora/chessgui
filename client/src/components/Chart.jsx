@@ -68,12 +68,42 @@ const options = {
   },
 };
 
+const click = (chart, selected) => {
+  console.log(selected);
+  if (!chart) return;
+  const meta = chart.getDatasetMeta(0);
+  if (!meta.data[selected]) return;
+  const x = meta.data[selected].x;
+  const y = meta.data[selected].y;
+
+  const canvas = chart.canvas;
+
+  const bounds = canvas.getBoundingClientRect();
+  const mouseX = Math.round(
+    (((bounds.left + x) / (bounds.right - bounds.left)) * canvas.width) /
+      chart.currentDevicePixelRatio
+  );
+  const mouseY = Math.round(
+    (((bounds.top + y) / (bounds.bottom - bounds.top)) * canvas.height) /
+      chart.currentDevicePixelRatio
+  );
+
+  const event = new MouseEvent("click", {
+    screenX: mouseX,
+    screenY: mouseY,
+    clientX: mouseX,
+    clientY: mouseY,
+  });
+  canvas.dispatchEvent(event);
+};
+
 const EvalChart = ({ scores, onClick, selected }) => {
   const [chart, setChart] = useState();
 
   useEffect(() => {
     Chart.register(...registerables);
     const canvas = document.getElementById("eval-chart-canvas");
+
     const ctx = canvas.getContext("2d");
     const c = new Chart(ctx, {
       type: "lineWithLine",
@@ -95,9 +125,16 @@ const EvalChart = ({ scores, onClick, selected }) => {
     chart.update();
   }, [scores, chart]);
 
+  useEffect(() => {
+    click(chart, selected);
+  }, [selected]);
+
   return (
     <div className="eval-chart">
-      <canvas id="eval-chart-canvas"></canvas>
+      <canvas
+        id="eval-chart-canvas"
+        onMouseLeave={() => click(chart, selected)}
+      ></canvas>
     </div>
   );
 };

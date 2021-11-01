@@ -63,7 +63,7 @@ body {
 
 .moves {
   height: 90%;
-  overflow: scroll;
+  overflow: auto;
   background-color: #101010;
   display: flex;
   flex-wrap: wrap;
@@ -89,6 +89,10 @@ body {
   justify-content: space-between;
 }
 
+.row .active {
+  background-color: antiquewhite;
+}
+
 .row div {
   padding-left: 5px;
   padding-right: 5px;
@@ -99,6 +103,7 @@ body {
   padding-left: 5px;
   padding-right: 5px;
   text-align: right;
+  color: #ddd;
 }
 
 .row-white,

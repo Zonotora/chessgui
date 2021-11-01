@@ -197,13 +197,14 @@ const App: React.FC = () => {
           />
         </div>
 
-        <Evalbar evaluation={scores.length > 0 ? scores[move] : 0.0} />
+        <Evalbar evaluation={move < scores.length ? scores[move] : 0.0} />
 
         <div className="panel">
           <div className="moves">
             <History
               moves={chess.history()}
               onClick={(move) => setMove(move)}
+              selected={move}
             />
           </div>
 
@@ -213,6 +214,7 @@ const App: React.FC = () => {
               onClick={() => {
                 const fen = chess.first();
                 setFen(fen);
+                setMove(chess.current);
               }}
             >
               <BsFillSkipBackwardFill size={40} />
@@ -222,6 +224,7 @@ const App: React.FC = () => {
               onClick={() => {
                 const fen = chess.previous();
                 setFen(fen);
+                setMove(chess.current);
               }}
             >
               <BsFillSkipStartFill size={40} />
@@ -231,6 +234,7 @@ const App: React.FC = () => {
               onClick={() => {
                 const fen = chess.next();
                 setFen(fen);
+                setMove(chess.current);
               }}
             >
               <BsFillSkipEndFill size={40} />
@@ -240,6 +244,7 @@ const App: React.FC = () => {
               onClick={() => {
                 const fen = chess.last();
                 setFen(fen);
+                setMove(chess.current);
               }}
             >
               <BsFillSkipForwardFill size={40} />

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 interface IHistory {
   moves: string[];
   onClick: (move: number) => void;
+  selected: number;
 }
 
 interface IRow {
@@ -11,6 +12,7 @@ interface IRow {
   black: string;
   onClickWhite: () => void;
   onClickBlack: () => void;
+  selected: number;
 }
 
 const Row: React.FC<IRow> = ({
@@ -19,21 +21,36 @@ const Row: React.FC<IRow> = ({
   black,
   onClickWhite,
   onClickBlack,
+  selected,
 }) => {
+  useEffect(() => {
+    document
+      .getElementsByClassName("active")[0]
+      .scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [selected]);
+
   return (
     <div className="row">
       <div className="row-index"> {index}</div>
-      <div className="row-white" onClick={onClickWhite}>
+      <div
+        className={`row-white${selected === (index - 1) * 2 ? " active" : ""}`}
+        onClick={onClickWhite}
+      >
         {white}
       </div>
-      <div className="row-black" onClick={onClickBlack}>
+      <div
+        className={`row-black${
+          selected === (index - 1) * 2 + 1 ? " active" : ""
+        }`}
+        onClick={onClickBlack}
+      >
         {black}
       </div>
     </div>
   );
 };
 
-const History: React.FC<IHistory> = ({ moves, onClick }) => {
+const History: React.FC<IHistory> = ({ moves, onClick, selected }) => {
   const [rows, setRows] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
@@ -45,12 +62,13 @@ const History: React.FC<IHistory> = ({ moves, onClick }) => {
           white={moves[i]}
           black={i < moves.length ? moves[i + 1] : ""}
           onClickWhite={() => onClick(i)}
-          onClickBlack={i < moves.length ? () => onClick(i + 1) : () => {}}
+          onClickBlack={i + 1 < moves.length ? () => onClick(i + 1) : () => {}}
+          selected={selected}
         />
       );
     }
     setRows(tRows);
-  }, [moves]);
+  }, [moves, selected]);
 
   return <>{rows}</>;
 };
