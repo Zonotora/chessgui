@@ -12,7 +12,7 @@ import History from "./components/History";
 import Chess from "./chess";
 import Chart from "./components/Chart";
 import Header from "./components/Header";
-import Evalbar from "./components/Evalbar";
+import Evalbar, { IScore } from "./components/Evalbar";
 import data from "./data.json";
 import data2 from "./data2.json";
 
@@ -96,7 +96,7 @@ const post = async (url = "", data = {}) => {
 const App: React.FC = () => {
   const [chess, setChess] = useState(new Chess());
   const [fen, setFen] = useState<string>(new Chess().fen());
-  const [scores, setScores] = useState<number[]>([]);
+  const [scores, setScores] = useState<IScore[]>([]);
   const [move, setMove] = useState<number>(0);
 
   useEffect(() => {
@@ -108,7 +108,7 @@ const App: React.FC = () => {
     const fen = chess.now();
     setFen(fen);
 
-    const tScores: number[] = [];
+    const tScores: IScore[] = [];
     const h = chess.history();
     const d = h && h[1] === "c5" ? data2 : data;
     for (let i = 0; i < d.info.length; i++) {
@@ -120,59 +120,59 @@ const App: React.FC = () => {
         score = Math.sign(parseInt(info.score.mate)) * 20;
       }
       score = i % 2 === 1 ? score : -score;
-      tScores.push(score);
+      tScores.push({ score, mate: info.score.mate });
     }
 
     setScores(tScores);
 
     return;
 
-    const baseScores: number[] = [];
-    for (let i = 0; i < chess.fens.length; i++) {
-      baseScores.push(0);
-    }
-    setScores(baseScores);
+    // const baseScores: IScore[] = [];
+    // for (let i = 0; i < chess.fens.length; i++) {
+    //   baseScores.push(0);
+    // }
+    // setScores(baseScores);
 
-    post("/api/new", {
-      fens: chess.fens,
-    }).then((response) => {
-      console.log(response);
-    });
+    // post("/api/new", {
+    //   fens: chess.fens,
+    // }).then((response) => {
+    //   console.log(response);
+    // });
 
-    let received = 0;
+    // let received = 0;
 
-    const interval = setInterval(() => {
-      post("/api/status", {
-        received,
-      }).then((response) => {
-        received = response.info.length;
+    // const interval = setInterval(() => {
+    //   post("/api/status", {
+    //     received,
+    //   }).then((response) => {
+    //     received = response.info.length;
 
-        const tScores = [...baseScores];
-        for (let i = 0; i < response.info.length; i++) {
-          const info = response.info[i].info;
-          let score = 0;
-          if (info.score.cp) {
-            score = info.score.cp;
-          } else if (info.score.mate) {
-            const mate = parseInt(info.score.mate);
-            let sign = Math.sign(mate);
-            if (mate === 0 && i > 0) {
-              sign = Math.sign(tScores[i - 1]);
-              sign = i % 2 === 1 ? sign : -sign;
-            }
-            score = sign * 20;
-          }
-          score = i % 2 === 1 ? score : -score;
-          tScores[i] = score;
-        }
-        console.log(response);
-        setScores(tScores);
-        if (response.status) {
-          clearInterval(interval);
-        }
-      });
-    }, 3000);
-    return () => clearInterval(interval);
+    //     const tScores = [...baseScores];
+    //     for (let i = 0; i < response.info.length; i++) {
+    //       const info = response.info[i].info;
+    //       let score = 0;
+    //       if (info.score.cp) {
+    //         score = info.score.cp;
+    //       } else if (info.score.mate) {
+    //         const mate = parseInt(info.score.mate);
+    //         let sign = Math.sign(mate);
+    //         if (mate === 0 && i > 0) {
+    //           sign = Math.sign(tScores[i - 1]);
+    //           sign = i % 2 === 1 ? sign : -sign;
+    //         }
+    //         score = sign * 20;
+    //       }
+    //       score = i % 2 === 1 ? score : -score;
+    //       tScores[i] = score;
+    //     }
+    //     console.log(response);
+    //     setScores(tScores);
+    //     if (response.status) {
+    //       clearInterval(interval);
+    //     }
+    //   });
+    // }, 3000);
+    // return () => clearInterval(interval);
   }, [chess]);
 
   return (
@@ -197,7 +197,13 @@ const App: React.FC = () => {
           />
         </div>
 
-        <Evalbar evaluation={move < scores.length ? scores[move] : 0.0} />
+        <Evalbar
+          evaluation={
+            move < scores.length
+              ? scores[move]
+              : { score: 0.0, mate: undefined }
+          }
+        />
 
         <div className="panel">
           <div className="moves">
@@ -255,7 +261,7 @@ const App: React.FC = () => {
       <div className="bottom">
         <Chart
           selected={move}
-          scores={scores}
+          scores={scores.map(({ score }) => score)}
           onClick={(move: number) => setMove(move)}
         />
       </div>

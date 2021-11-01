@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 
+export interface IScore {
+  score: number;
+  mate: string | undefined;
+}
+
 interface IEvalbar {
-  evaluation: number;
+  evaluation: IScore;
 }
 
 interface IColor {
@@ -11,15 +16,15 @@ interface IColor {
   downBackground: string;
 }
 
-interface IPercentage {
-  p: number;
-  e: string | number;
+interface IBar {
+  percentage: number;
+  evaluation: string | number;
 }
 
 const Evalbar: React.FC<IEvalbar> = ({ evaluation }) => {
-  const [percentage, setPercentage] = useState<IPercentage>({
-    p: 0.5,
-    e: 0,
+  const [bar, setBar] = useState<IBar>({
+    percentage: 0.5,
+    evaluation: 0,
   });
   const [color, setColor] = useState<IColor>({
     up: "#ddd",
@@ -29,12 +34,21 @@ const Evalbar: React.FC<IEvalbar> = ({ evaluation }) => {
   });
 
   useEffect(() => {
-    const e = (evaluation / 10) * 0.5;
+    const e = (evaluation.score / 10) * 0.5;
     const a = Math.min(Math.max(e, -0.5), 0.5);
+    const mate = evaluation.mate?.startsWith("-")
+      ? evaluation.mate.substring(1)
+      : evaluation.mate;
 
-    setPercentage({
-      p: 0.5 + a,
-      e: evaluation >= 10 ? Math.round(evaluation) : evaluation.toFixed(1),
+    let tEvaluation = "";
+    if (evaluation.mate) tEvaluation = `M${mate}`;
+    else if (evaluation.score >= 10)
+      tEvaluation = Math.round(evaluation.score).toString();
+    else tEvaluation = evaluation.score.toFixed(1);
+
+    setBar({
+      percentage: 0.5 + a,
+      evaluation: tEvaluation,
     });
   }, [evaluation]);
 
@@ -43,17 +57,17 @@ const Evalbar: React.FC<IEvalbar> = ({ evaluation }) => {
       <div
         className="evalbar-up"
         style={{
-          height: `${100 * (1 - percentage.p)}%`,
+          height: `${100 * (1 - bar.percentage)}%`,
           backgroundColor: color.upBackground,
           color: color.up,
         }}
       >
-        <span>{evaluation < 0 ? percentage.e : ""}</span>
+        <span>{evaluation.score < 0 ? bar.evaluation : ""}</span>
       </div>
       <div
         className="evalbar-down"
         style={{
-          height: `${100 * percentage.p}%`,
+          height: `${100 * bar.percentage}%`,
           backgroundColor: color.downBackground,
           color: color.down,
           display: "flex",
@@ -61,7 +75,7 @@ const Evalbar: React.FC<IEvalbar> = ({ evaluation }) => {
           justifyContent: "end",
         }}
       >
-        <span>{evaluation >= 0 ? percentage.e : ""}</span>
+        <span>{evaluation.score >= 0 ? bar.evaluation : ""}</span>
       </div>
     </div>
   );
