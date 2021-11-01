@@ -35,13 +35,13 @@ class Stockfish {
     this.fens = fens;
     this.count = fens.length + 1;
     this.buffer = [];
-    this.queue = [];
     this.info = [];
     this.status = false;
   }
 
   next() {
-    return this.fens.shift();
+    this.current = this.fens.shift();
+    return this.current;
   }
 
   parse(s) {
@@ -54,9 +54,9 @@ class Stockfish {
         info,
       });
 
-      this.status = this.info.length === this.count;
+      this.status = this.info.length === this.count - 1;
       this.buffer = [];
-      console.log(this.fens.length);
+      console.log(this.info.length, this.count, this.fens.length);
       return true;
     }
 

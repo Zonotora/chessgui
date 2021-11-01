@@ -12,6 +12,7 @@ import History from "./components/History";
 import Chess from "./chess";
 import Chart from "./components/Chart";
 import Header from "./components/Header";
+import data from "./data.json";
 
 // pass in a FEN string to load a particular position
 
@@ -74,10 +75,33 @@ const App: React.FC = () => {
   const [chess, setChess] = useState(new Chess());
   const [fen, setFen] = useState<string>(new Chess().fen());
   const [scores, setScores] = useState<number[]>([]);
+  const [move, setMove] = useState<number>(0);
+
+  useEffect(() => {
+    const fen = chess.moveTo(move);
+    if (fen) setFen(fen);
+  }, [move, chess]);
 
   useEffect(() => {
     const fen = chess.now();
     setFen(fen);
+
+    const tScores: number[] = [];
+    for (let i = 0; i < data.info.length; i++) {
+      const info = data.info[i].info;
+      let score = 0;
+      if (info.score.cp) {
+        score = info.score.cp;
+      } else if (info.score.mate) {
+        score = Math.sign(parseInt(info.score.mate)) * 100;
+      }
+      score = i % 2 === 1 ? score : -score;
+      tScores.push(score);
+    }
+
+    setScores(tScores);
+
+    return;
     const baseScores: number[] = [];
     for (let i = 0; i < chess.fens.length; i++) {
       baseScores.push(0);
@@ -90,19 +114,25 @@ const App: React.FC = () => {
       console.log(response);
     });
 
+    let received = 0;
+
     const interval = setInterval(() => {
       post("/api/status", {
-        fens: chess.fens,
+        received,
       }).then((response) => {
+        received = response.info.length;
+
         const tScores = [...baseScores];
         for (let i = 0; i < response.info.length; i++) {
           const info = response.info[i].info;
-
+          let score = 0;
           if (info.score.cp) {
-            tScores[i] = info.score.cp;
+            score = info.score.cp;
           } else if (info.score.mate) {
-            tScores[i] = parseInt(info.score.mate) * 20;
+            score = Math.sign(parseInt(info.score.mate)) * 100;
           }
+          score = i % 2 === 1 ? score : -score;
+          tScores[i] = score;
         }
         console.log(response);
         setScores(tScores);
@@ -139,10 +169,7 @@ const App: React.FC = () => {
           <div className="moves">
             <History
               moves={chess.history()}
-              onClick={(move) => {
-                const fen = chess.moveTo(move);
-                setFen(fen);
-              }}
+              onClick={(move) => setMove(move)}
             />
           </div>
 
@@ -187,7 +214,11 @@ const App: React.FC = () => {
         </div>
       </div>
       <div className="bottom">
-        <Chart scores={scores} />
+        <Chart
+          selected={move}
+          scores={scores}
+          onClick={(move: number) => setMove(move)}
+        />
       </div>
     </div>
   );

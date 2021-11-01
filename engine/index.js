@@ -21,14 +21,17 @@ const sendUCI = (msg) => {
   engineProcess.stdin.write(`${msg}\n`);
 };
 
+const sendFen = (fen, depth = 18) => {
+  sendUCI(`position fen ${fen}`);
+  sendUCI(`go depth ${depth}`);
+};
+
 engineProcess.stdout.on("data", (chunk) => {
   const s = chunk.toString("ascii");
   if (engine.parse(s)) {
     const fen = engine.next();
     console.log(fen);
-
-    sendUCI(`position fen ${fen}`);
-    sendUCI("go depth 15");
+    sendFen(fen);
   }
 });
 
@@ -39,12 +42,15 @@ app.post("/api/new", function (req, res) {
   const fens = req.body.fens;
   const fen = fens.shift();
   engine.setFens(fens);
-  sendUCI(`position fen ${fen}`);
-  sendUCI("go depth 15");
+  sendFen(fen);
 
   res.json({ status: engine.status });
 });
 
 app.post("/api/status", function (req, res) {
+  if (req.body.received === engine.info.length) {
+    sendFen(engine.current);
+  }
+
   res.json({ info: engine.info, status: engine.status });
 });
