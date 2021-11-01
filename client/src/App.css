@@ -21,6 +21,10 @@ body {
   height: var(--bottom-height);
 }
 
+.header {
+  display: flex;
+}
+
 .header div {
   height: inherit;
   width: 50px;

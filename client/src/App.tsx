@@ -13,6 +13,7 @@ import Chess from "./chess";
 import Chart from "./components/Chart";
 import Header from "./components/Header";
 import data from "./data.json";
+import data2 from "./data2.json";
 
 // pass in a FEN string to load a particular position
 
@@ -54,6 +55,26 @@ const pgn = [
   "23.Bd7+ Kf8 24.Bxe7# 1-0",
 ];
 
+const pgn2 = [
+  '[Event "Live Chess"]',
+  '[Site "Chess.com"]',
+  '[Date "2021.10.24"]',
+  '[Round "?"]',
+  '[White "Unknown 1"]',
+  '[Black "Unknown 2"]',
+  '[Result "1-0"]',
+  '[ECO "B20"]',
+  '[WhiteElo "1000"]',
+  '[BlackElo "1000"]',
+  '[TimeControl "60+1"]',
+  '[EndTime "7:55:30 PDT"]',
+  '[Termination "Unknown 1 won on time"]',
+  "",
+  "1. e4 c5 2. Bc4 d6 3. Nf3 Nf6 4. O-O Nc6 5. e5 Nxe5 6. Nxe5 dxe5 7. Re1 Qc7 8.",
+  "d3 e6 9. Bg5 Be7 10. Bxf6 Bxf6 11. Qf3 O-O 12. Nc3 Bd7 13. Ne4 Bc6 14. Nxf6+",
+  "gxf6 15. Qg4+ Kh8 16. Re3 Rg8 17. Qh5 Rg6 18. Rh3 Rg7 19. g3 Kg8 20. Re1 Rd8 21.",
+  "Qh6 Qe7 22. Rh4 a6 23. a3 b5 24. Ba2 1-0",
+];
 const post = async (url = "", data = {}) => {
   const response = await fetch(url, {
     method: "POST",
@@ -86,21 +107,24 @@ const App: React.FC = () => {
     const fen = chess.now();
     setFen(fen);
 
-    // const tScores: number[] = [];
-    // for (let i = 0; i < data.info.length; i++) {
-    //   const info = data.info[i].info;
-    //   let score = 0;
-    //   if (info.score.cp) {
-    //     score = info.score.cp;
-    //   } else if (info.score.mate) {
-    //     score = Math.sign(parseInt(info.score.mate)) * 100;
-    //   }
-    //   score = i % 2 === 1 ? score : -score;
-    //   tScores.push(score);
-    // }
+    const tScores: number[] = [];
+    const h = chess.history();
+    const d = h && h[1] === "c5" ? data2 : data;
+    for (let i = 0; i < d.info.length; i++) {
+      const info = d.info[i].info;
+      let score = 0;
+      if (info.score.cp) {
+        score = info.score.cp;
+      } else if (info.score.mate) {
+        score = Math.sign(parseInt(info.score.mate)) * 20;
+      }
+      score = i % 2 === 1 ? score : -score;
+      tScores.push(score);
+    }
 
-    // setScores(tScores);
-    // console.log(chess.fens);
+    setScores(tScores);
+
+    return;
 
     const baseScores: number[] = [];
     for (let i = 0; i < chess.fens.length; i++) {
@@ -135,7 +159,7 @@ const App: React.FC = () => {
               sign = Math.sign(tScores[i - 1]);
               sign = i % 2 === 1 ? sign : -sign;
             }
-            score = sign * 100;
+            score = sign * 20;
           }
           score = i % 2 === 1 ? score : -score;
           tScores[i] = score;
@@ -156,6 +180,9 @@ const App: React.FC = () => {
         <Header
           loadPGN={() => {
             setChess(new Chess("", pgn.join("\n")));
+          }}
+          loadPGN2={() => {
+            setChess(new Chess("", pgn2.join("\n")));
           }}
         />
       </div>
