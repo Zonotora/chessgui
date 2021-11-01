@@ -86,22 +86,22 @@ const App: React.FC = () => {
     const fen = chess.now();
     setFen(fen);
 
-    const tScores: number[] = [];
-    for (let i = 0; i < data.info.length; i++) {
-      const info = data.info[i].info;
-      let score = 0;
-      if (info.score.cp) {
-        score = info.score.cp;
-      } else if (info.score.mate) {
-        score = Math.sign(parseInt(info.score.mate)) * 100;
-      }
-      score = i % 2 === 1 ? score : -score;
-      tScores.push(score);
-    }
+    // const tScores: number[] = [];
+    // for (let i = 0; i < data.info.length; i++) {
+    //   const info = data.info[i].info;
+    //   let score = 0;
+    //   if (info.score.cp) {
+    //     score = info.score.cp;
+    //   } else if (info.score.mate) {
+    //     score = Math.sign(parseInt(info.score.mate)) * 100;
+    //   }
+    //   score = i % 2 === 1 ? score : -score;
+    //   tScores.push(score);
+    // }
 
-    setScores(tScores);
+    // setScores(tScores);
+    // console.log(chess.fens);
 
-    return;
     const baseScores: number[] = [];
     for (let i = 0; i < chess.fens.length; i++) {
       baseScores.push(0);
@@ -129,7 +129,13 @@ const App: React.FC = () => {
           if (info.score.cp) {
             score = info.score.cp;
           } else if (info.score.mate) {
-            score = Math.sign(parseInt(info.score.mate)) * 100;
+            const mate = parseInt(info.score.mate);
+            let sign = Math.sign(mate);
+            if (mate === 0 && i > 0) {
+              sign = Math.sign(tScores[i - 1]);
+              sign = i % 2 === 1 ? sign : -sign;
+            }
+            score = sign * 100;
           }
           score = i % 2 === 1 ? score : -score;
           tScores[i] = score;

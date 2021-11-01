@@ -34,34 +34,45 @@ class Stockfish {
   setFens(fens) {
     this.fens = fens;
     this.count = fens.length + 1;
-    this.buffer = [];
+    this.buffer = "";
     this.info = [];
     this.status = false;
   }
 
   next() {
-    this.current = this.fens.shift();
-    return this.current;
+    return this.fens.shift();
   }
 
   parse(s) {
-    if (s.startsWith("bestmove")) {
-      const bestmove = s.split(" ")[1];
-      const info = parseInfo(this.buffer[this.buffer.length - 1]);
+    const lines = s.split("\n");
+    let hasBestmove = false;
 
-      this.info.push({
-        bestmove,
-        info,
-      });
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].startsWith("bestmove")) {
+        hasBestmove = true;
+        const bestmove = s.split(" ")[1];
+        const last = i === 0 ? this.buffer : lines[i - 1];
 
-      this.status = this.info.length === this.count - 1;
-      this.buffer = [];
-      console.log(this.info.length, this.count, this.fens.length);
-      return true;
+        console.log(last);
+        const info = parseInfo(last);
+
+        this.info.push({
+          bestmove,
+          info,
+        });
+
+        this.status = this.info.length === this.count;
+        this.buffer = "";
+        console.log(this.info.length, this.count);
+      }
     }
-
-    this.buffer.push(s);
-    return false;
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (lines[i] !== "") {
+        this.buffer = lines[i];
+        break;
+      }
+    }
+    return hasBestmove;
   }
 }
 
