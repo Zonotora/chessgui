@@ -58,8 +58,8 @@ const options = {
   },
   scales: {
     y: {
-      min: -20,
-      max: 20,
+      min: -10,
+      max: 10,
     },
   },
   interaction: {
@@ -119,7 +119,10 @@ const EvalChart = ({ scores, onClick, selected }) => {
 
   useEffect(() => {
     if (!chart) return;
-    chart.data.datasets[0].data = scores;
+    const tScores = scores.map((x) =>
+      Math.abs(x) > 10 ? Math.sign(x) * 10 : x
+    );
+    chart.data.datasets[0].data = tScores;
     chart.data.labels = scores.map((_, i) => i);
     chart.update();
   }, [scores, chart]);
