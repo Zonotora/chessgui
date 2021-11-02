@@ -64,7 +64,7 @@ body {
 .moves {
   height: 90%;
   overflow: auto;
-  background-color: #101010;
+  background-color: #2e2e2e;
   display: flex;
   flex-wrap: wrap;
 }
@@ -90,7 +90,8 @@ body {
 }
 
 .row .active {
-  background-color: antiquewhite;
+  background-color: #101010;
+  color: white;
 }
 
 .row div {
@@ -104,18 +105,24 @@ body {
   padding-right: 5px;
   text-align: right;
   color: #ddd;
+  background-color: #161616;
 }
 
 .row-white,
 .row-black {
   cursor: pointer;
   width: 50%;
+  border-bottom: solid 1px #1a1a1a;
+}
+
+.row-white {
+  border-right: solid 1px #101010;
 }
 
 .row-white:hover {
-  background-color: aliceblue;
+  background-color: #4b4b4b;
 }
 
 .row-black:hover {
-  background-color: black;
+  background-color: #202020;
 }
