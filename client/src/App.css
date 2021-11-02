@@ -59,6 +59,7 @@ body {
 
 .panel {
   width: calc(40% - 12px);
+  margin-right: 5px;
 }
 
 .moves-header {
@@ -136,4 +137,14 @@ body {
 
 .row-black:hover {
   background-color: #202020;
+}
+
+.alternative-moves {
+  height: 30%;
+  background-color: #101010;
+}
+
+.summary {
+  height: 70%;
+  background-color: #4b4b4b;
 }

@@ -69,7 +69,6 @@ const options = {
 };
 
 const click = (chart, selected) => {
-  console.log(selected);
   if (!chart) return;
   const meta = chart.getDatasetMeta(0);
   if (!meta.data[selected]) return;

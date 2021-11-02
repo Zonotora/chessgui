@@ -15,7 +15,8 @@ import Header from "./components/Header";
 import Evalbar, { IScore } from "./components/Evalbar";
 import data from "./data.json";
 import data2 from "./data2.json";
-
+import AlternativeMoves from "./components/AlternativeMoves";
+import Summary from "./components/Summary";
 // pass in a FEN string to load a particular position
 
 // [Event "Casual Game"]
@@ -229,7 +230,11 @@ const App: React.FC = () => {
           }
         />
 
-        <div className="panel"></div>
+        <div className="panel">
+          <AlternativeMoves />
+
+          <Summary />
+        </div>
 
         <div className="panel">
           <div className="moves-header">
