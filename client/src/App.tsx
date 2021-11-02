@@ -8,7 +8,7 @@ import {
   BsFillSkipBackwardFill,
 } from "react-icons/bs";
 
-import History from "./components/History";
+import Moves from "./components/Moves";
 import Chess from "./chess";
 import Chart from "./components/Chart";
 import Header from "./components/Header";
@@ -93,11 +93,22 @@ const post = async (url = "", data = {}) => {
   return response.json();
 };
 
+interface IHeader {
+  white: string | undefined;
+  black: string | undefined;
+  date: string | undefined;
+  result: string | undefined;
+  termination: string | undefined;
+  whiteElo: string | undefined;
+  blackElo: string | undefined;
+}
+
 const App: React.FC = () => {
   const [chess, setChess] = useState(new Chess());
   const [fen, setFen] = useState<string>(new Chess().fen());
   const [scores, setScores] = useState<IScore[]>([]);
   const [move, setMove] = useState<number>(0);
+  const [header, setHeader] = useState<IHeader>();
 
   useEffect(() => {
     const fen = chess.moveTo(move);
@@ -105,6 +116,19 @@ const App: React.FC = () => {
   }, [move, chess]);
 
   useEffect(() => {
+    // set metadata information about the game
+    const tHeader = chess.header();
+    setHeader({
+      white: tHeader.White,
+      black: tHeader.Black,
+      date: tHeader.Date,
+      result: tHeader.Result,
+      termination: tHeader.termination,
+      whiteElo: tHeader.WhiteElo,
+      blackElo: tHeader.BlackElo,
+    });
+
+    // get current fen from chess board and visualize it
     const fen = chess.now();
     setFen(fen);
 
@@ -205,16 +229,21 @@ const App: React.FC = () => {
           }
         />
 
+        <div className="panel"></div>
+
         <div className="panel">
-          <div className="moves">
-            <History
-              moves={chess.history()}
-              onClick={(move) => setMove(move)}
-              selected={move}
-            />
+          <div className="moves-header">
+            <div>{header?.white}</div>
+            <div>{header?.black}</div>
           </div>
 
-          <div className="play-panel">
+          <Moves
+            moves={chess.history()}
+            onClick={(move) => setMove(move)}
+            selected={move}
+          />
+
+          <div className="moves-buttons">
             <div
               className="first"
               onClick={() => {

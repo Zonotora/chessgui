@@ -61,22 +61,33 @@ body {
   width: calc(40% - 12px);
 }
 
+.moves-header {
+  height: 10%;
+  background-color: #101010;
+  text-align: right;
+  color: white;
+}
+
+.moves-header div {
+  margin-right: 5px;
+}
+
 .moves {
-  height: 90%;
+  height: 80%;
   overflow: auto;
   background-color: #2e2e2e;
   display: flex;
   flex-wrap: wrap;
 }
 
-.play-panel {
+.moves-buttons {
   height: 10%;
   background-color: #101010;
   display: flex;
   justify-content: center;
 }
 
-.play-panel div {
+.moves-buttons div {
   min-width: 40px;
   height: 20px;
   cursor: pointer;

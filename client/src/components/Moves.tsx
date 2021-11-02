@@ -50,7 +50,7 @@ const Row: React.FC<IRow> = ({
   );
 };
 
-const History: React.FC<IHistory> = ({ moves, onClick, selected }) => {
+const Moves: React.FC<IHistory> = ({ moves, onClick, selected }) => {
   const [rows, setRows] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const History: React.FC<IHistory> = ({ moves, onClick, selected }) => {
     setRows(tRows);
   }, [moves, selected]);
 
-  return <>{rows}</>;
+  return <div className="moves">{rows}</div>;
 };
 
-export default History;
+export default Moves;
